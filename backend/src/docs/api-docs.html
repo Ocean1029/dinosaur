@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tung Tung Tung Sahur API 文檔</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .endpoint {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .method {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: white;
+        }
+        .method.get {
+            background: #61affe;
+        }
+        .method.post {
+            background: #49cc90;
+        }
+        .method.put {
+            background: #fca130;
+        }
+        .method.delete {
+            background: #f93e3e;
+        }
+        .path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-top: 20px;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .params-table th,
+        .params-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .params-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #555;
+        }
+        .params-table code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .response-example {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .response-example pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        .try-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .try-button:hover {
+            background: #5568d3;
+        }
+        .links {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .links h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .links ul {
+            list-style: none;
+        }
+        .links li {
+            margin-bottom: 10px;
+        }
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Tung Tung Tung Sahur API</h1>
+            <p>API 文檔與使用說明</p>
+        </header>
+
+        <div class="links">
+            <h2>🔗 快速連結</h2>
+            <ul>
+                <li>📊 <a href="/docs.json" target="_blank">OpenAPI JSON 規格</a></li>
+                <li>🗄️ <a href="http://localhost:5555" target="_blank">Prisma Studio (數據庫管理)</a></li>
+                <li>💚 <a href="/api/health" target="_blank">健康檢查端點</a></li>
+            </ul>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="path">/api/health</span>
+            </div>
+            <div class="description">
+                <strong>健康檢查端點</strong> - 檢查應用程式運行狀態
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📝 說明</div>
+                <p>此端點用於檢查應用程式的健康狀態，可用於監控和負載均衡器健康檢查。</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📥 請求參數</div>
+                <p>此端點不需要任何參數。</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📤 回應範例</div>
+                <div class="response-example">
+                    <pre>{
+  "status": "ok",
+  "timestamp": "2025-11-08T09:00:00.000Z",
+  "uptime": 12345,
+  "environment": "development"
+}</pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">✅ 狀態碼</div>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>200 OK</strong> - 應用程式運行正常</li>
+                </ul>
+            </div>
+
+            <a href="/api/health" class="try-button" target="_blank">試試看 →</a>
+        </div>
+
+        <div style="background: white; border-radius: 8px; padding: 25px; margin-top: 30px; text-align: center; color: #666;">
+            <p>📚 更多 API 端點將陸續添加...</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">查看 <code>/docs.json</code> 獲取完整的 OpenAPI 規格</p>
+        </div>
+    </div>
+</body>
+</html>
+

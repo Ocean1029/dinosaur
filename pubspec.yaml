@@ -1,0 +1,67 @@
+name: dinosaur
+description: "Dinosaur app - 城市跑步路線與活動資訊"
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # 狀態管理與路由
+  get: ^4.6.6
+  
+  # 地圖與定位
+  google_maps_flutter: ^2.7.0
+  geolocator: ^13.0.1
+  
+  # 網路請求
+  http: ^1.2.2
+  
+  # JSON 序列化
+  json_annotation: ^4.9.0
+  
+  # 圖片處理
+  cached_network_image: ^3.4.1
+  
+  # 分享功能
+  share_plus: ^10.0.2
+  
+  # 檔案系統
+  path_provider: ^2.1.3
+  
+  # NFC 功能（如果需要）
+  nfc_manager: ^4.1.1
+  
+  # 日期格式化
+  intl: any
+  
+  # SVG 支援
+  flutter_svg: ^2.0.10+1
+  
+  # 環境變數管理
+  flutter_dotenv: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  flutter_gen_runner:
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/mock_data/
+    - assets/svg/
+    - .env
+  
+  # 如果需要使用字體
+  # fonts:
+  #   - family: YourFont
+  #     fonts:
+  #       - asset: fonts/YourFont-Regular.ttf

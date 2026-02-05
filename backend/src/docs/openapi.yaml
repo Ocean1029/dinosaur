@@ -1,0 +1,25 @@
+# Example OpenAPI extension to document the health endpoint.
+# This file is automatically merged with the main Swagger definition
+
+# Health endpoint documentation
+paths:
+  /health:
+    get:
+      summary: Read the application health report
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Application is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+

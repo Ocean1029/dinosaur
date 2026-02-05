@@ -1,0 +1,16 @@
+{
+    "success": true,
+    "data": {
+      "userId": "7f3562f4-bb3f-4ec7-89b9-da3b4b5ff250",
+      "name": "金大森",
+      "email": "user@example.com",
+      "avatar": null,
+      "totalCoins": 1250,
+      "totalDistance": 1000,
+      "totalTime": 3600,
+      "createdAt": "2024-06-03T00:00:00Z",
+      "updatedAt": "2024-06-03T00:00:00Z"
+    }
+  }
+  
+  

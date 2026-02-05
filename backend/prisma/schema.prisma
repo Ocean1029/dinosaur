@@ -1,0 +1,167 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// User model representing application users
+model User {
+  id        String   @id @default(uuid()) @db.Text
+  name      String   @db.Text
+  email     String   @unique @db.Text
+  avatarUrl String?  @map("avatar_url") @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp
+
+  // Relations
+  userLocationCollections UserLocationCollection[]
+  activities              Activity[]
+  userBadges              UserBadge[]
+
+  @@map("users")
+}
+
+/// Location model representing physical locations/points of interest
+model Location {
+  id           String   @id @default(uuid()) @db.Text
+  name         String   @db.Text
+  description  String?  @db.Text
+  latitude     Float    @db.DoublePrecision
+  longitude    Float    @db.DoublePrecision
+  area         String?  @db.Text // Administrative area (e.g., "大安區", "中正區")
+  nfcId        String?  @unique @map("nfc_id") @db.Text
+  isNfcEnabled Boolean  @default(false) @map("is_nfc_enabled")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp
+
+  // Relations
+  userLocationCollections    UserLocationCollection[]
+  activityCollectedLocations ActivityCollectedLocation[]
+  badgeLocationRequirements  BadgeLocationRequirement[]
+
+  @@map("locations")
+}
+
+/// UserLocationCollection model tracking which locations users have collected
+model UserLocationCollection {
+  id          Int      @id @default(autoincrement())
+  userId      String   @map("user_id") @db.Text
+  locationId  String   @map("location_id") @db.Text
+  collectedAt DateTime @map("collected_at") @db.Timestamp
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, locationId])
+  @@map("user_location_collections")
+}
+
+/// Activity model representing user activity sessions (e.g., walking, running)
+model Activity {
+  id          String   @id @default(uuid()) @db.Text
+  userId      String   @map("user_id") @db.Text
+  startTime   DateTime @map("start_time") @db.Timestamp
+  endTime     DateTime? @map("end_time") @db.Timestamp
+  distance    Float?   @db.DoublePrecision
+  duration    Int?     // Duration in seconds
+  averageSpeed Float?  @map("average_speed") @db.DoublePrecision
+  totalCoins  Int      @default(0) @map("total_coins")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp
+
+  // Relations
+  user                      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityTrackPoints       ActivityTrackPoint[]
+  activityCollectedLocations ActivityCollectedLocation[]
+
+  @@map("activities")
+}
+
+/// ActivityTrackPoint model storing GPS track points for activities
+model ActivityTrackPoint {
+  id         Int      @id @default(autoincrement())
+  activityId String   @map("activity_id") @db.Text
+  latitude   Float    @db.DoublePrecision
+  longitude  Float    @db.DoublePrecision
+  timestamp  DateTime @db.Timestamp
+  accuracy   Float?   @db.DoublePrecision
+
+  // Relations
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@map("activity_track_points")
+}
+
+/// ActivityCollectedLocation model tracking locations collected during an activity
+model ActivityCollectedLocation {
+  id         Int      @id @default(autoincrement())
+  activityId String   @map("activity_id") @db.Text
+  locationId String   @map("location_id") @db.Text
+  collectedAt DateTime @map("collected_at") @db.Timestamp
+  coinsEarned Int      @default(1) @map("coins_earned")
+
+  // Relations
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@map("activity_collected_locations")
+}
+
+/// Badge model representing achievement badges
+model Badge {
+  id          String   @id @default(uuid()) @db.Text
+  name        String   @db.Text
+  description String?  @db.Text
+  imageUrl    String?  @map("image_url") @db.Text
+  color       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp
+
+  // Relations
+  badgeLocationRequirements BadgeLocationRequirement[]
+  userBadges                UserBadge[]
+
+  @@map("badges")
+}
+
+/// BadgeLocationRequirement model defining which locations are required for a badge
+model BadgeLocationRequirement {
+  id         Int      @id @default(autoincrement())
+  badgeId    String   @map("badge_id") @db.Text
+  locationId String   @map("location_id") @db.Text
+
+  // Relations
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([badgeId, locationId])
+  @@map("badge_location_requirements")
+}
+
+/// UserBadge model tracking user badge progress and status
+model UserBadge {
+  id         Int       @id @default(autoincrement())
+  userId     String    @map("user_id") @db.Text
+  badgeId    String    @map("badge_id") @db.Text
+  unlockedAt DateTime? @map("unlocked_at") @db.Timestamp
+  status     UserBadgeStatus @default(Locked) @map("status")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+}
+
+/// Enum for user badge status
+enum UserBadgeStatus {
+  Locked      @map("locked")
+  InProgress  @map("in_progress")
+  Collected   @map("collected")
+}
+
