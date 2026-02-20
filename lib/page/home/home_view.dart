@@ -27,7 +27,7 @@ class HomeView extends GetView<HomeController> {
         // 訪問控制器的可觀察變數以確保 Obx 正確監視
         final isLoading = controller.isLoading.value;
         final errorMsg = controller.errorMessage.value;
-        
+
         // 檢查用戶是否登入
         if (Get.find<AccountService>().account == null) {
           return Center(
@@ -61,19 +61,19 @@ class HomeView extends GetView<HomeController> {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppText(
+              children: [
+                AppText(
                   errorMsg,
                   style: AppTextStyles.body1,
                   color: AppColors.red500,
-                  ),
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => controller.refresh(),
                   child: const AppText('重試'),
-                  ),
-                ],
-              ),
+                ),
+              ],
+            ),
           );
         }
 
@@ -101,17 +101,14 @@ class HomeView extends GetView<HomeController> {
                   child: _buildTrackingStatsCard(),
                 );
               }
-              // 用戶資料卡片（非追蹤時顯示，可點擊，覆蓋在地圖上方）
+              // 右上角頭貼 + 等級（非追蹤時顯示，可點擊進入個人資訊）
               if (controller.userProfile.value != null) {
                 return Positioned(
                   top: 16,
-                  left: 16,
                   right: 16,
                   child: GestureDetector(
-              onTap: () {
-                      Get.toNamed(AppRoute.stats);
-                    },
-                    child: _buildUserProfileCard(controller.userProfile.value!),
+                    onTap: () => Get.toNamed(AppRoute.stats),
+                    child: _buildAvatarWithLevel(controller.userProfile.value!),
                   ),
                 );
               }
@@ -159,21 +156,23 @@ class HomeView extends GetView<HomeController> {
     return Obx(() {
       final distanceMeters = controller.totalDistanceMeters.value;
       final elapsed = controller.elapsed.value;
-      
+
       // 格式化距離
       final distanceKm = distanceMeters / 1000;
       final formattedDistance = distanceKm >= 1
           ? '${distanceKm.toStringAsFixed(1)} 公里'
           : '${distanceMeters.toStringAsFixed(0)} 公尺';
-      
+
       // 格式化時長 (HH:MM:SS)
       final hours = elapsed.inHours;
       final minutes = elapsed.inMinutes.remainder(60);
       final seconds = elapsed.inSeconds.remainder(60);
-      final formattedDuration = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-      
+      final formattedDuration =
+          '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+
       return Container(
-        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16), // 上方8px padding
+        padding: const EdgeInsets.only(
+            top: 8, bottom: 8, left: 16, right: 16), // 上方8px padding
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
@@ -183,7 +182,7 @@ class HomeView extends GetView<HomeController> {
               offset: const Offset(0, 4),
               blurRadius: 4,
               spreadRadius: 0,
-          ),
+            ),
           ],
         ),
         child: Row(
@@ -191,7 +190,8 @@ class HomeView extends GetView<HomeController> {
             // 左欄：距離
             Expanded(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // icon 對齊 from start
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // icon 對齊 from start
                 children: [
                   // Icon 20×20，與左白匡距離24px（16px padding + 8px = 24px），與上方距離8px
                   const SizedBox(width: 8), // 16px padding + 8px = 24px
@@ -203,7 +203,7 @@ class HomeView extends GetView<HomeController> {
                   const SizedBox(width: 8), // icon與文字之間8px
                   // 標題和數值
                   Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // 標題 14px #91A0A8
@@ -227,7 +227,8 @@ class HomeView extends GetView<HomeController> {
             // 右欄：時長（icon貼齊白容器中線，內文向左對齊）
             Expanded(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // icon 對齊 from start
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // icon 對齊 from start
                 children: [
                   // Icon 貼齊白容器中線（在右欄的開始位置，即整個容器的中線）
                   Icon(
@@ -243,16 +244,17 @@ class HomeView extends GetView<HomeController> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // 標題 14px #91A0A8，與下方計算時間對齊
-                  AppText(
+                        AppText(
                           '時長',
                           style: AppTextStyles.h3Regular.copyWith(fontSize: 14),
                           color: const Color(0xFF91A0A8),
-                  ),
-                  const SizedBox(height: 4),
+                        ),
+                        const SizedBox(height: 4),
                         // 數值 24px #00B9CA, font-H2-semibold
-                  AppText(
+                        AppText(
                           formattedDuration,
-                          style: AppTextStyles.h2SemiBold.copyWith(fontSize: 24),
+                          style:
+                              AppTextStyles.h2SemiBold.copyWith(fontSize: 24),
                           color: const Color(0xFF00B9CA), // #00B9CA
                         ),
                       ],
@@ -267,116 +269,73 @@ class HomeView extends GetView<HomeController> {
     });
   }
 
-  /// 建立用戶資料卡片
-  Widget _buildUserProfileCard(userData) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          vertical: 12, horizontal: 24), // 上下12px，左右24px
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1), // 陰影顏色
-            offset: const Offset(0, 4), // X:0, Y:4
-            blurRadius: 4, // blur:4
-            spreadRadius: 0, // Spread:0
+  /// 右上角頭貼 + 等級（之後等級可替換成真實玩家等級）
+  Widget _buildAvatarWithLevel(userData) {
+    const avatarSize = 64.0;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                offset: const Offset(0, 2),
+                blurRadius: 6,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
-        children: [
-          // 頭貼 64×64，與白框左側距離24px（使用padding），上下距離12px（使用padding）
-          if (userData.avatarUrl != null && userData.avatarUrl!.isNotEmpty)
-            ClipOval(
-              child: AppCachedNetworkImage(
-                imageUrl: userData.avatarUrl!,
-                width: 64,
-                height: 64,
-                fit: BoxFit.cover,
-                borderRadius: 0,
+          child: userData.avatarUrl != null && userData.avatarUrl!.isNotEmpty
+              ? ClipOval(
+                  child: AppCachedNetworkImage(
+                    imageUrl: userData.avatarUrl!,
+                    width: avatarSize,
+                    height: avatarSize,
+                    fit: BoxFit.cover,
+                    borderRadius: 0,
+                  ),
+                )
+              : ClipOval(
+                  child: Container(
+                    width: avatarSize,
+                    height: avatarSize,
+                    decoration: const BoxDecoration(
+                      color: AppColors.grayscale200,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Assets.svg.logoIconTpe.svg(
+                      width: avatarSize,
+                      height: avatarSize,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                offset: const Offset(0, 1),
+                blurRadius: 4,
               ),
-            )
-          else
-            ClipOval(
-              child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.grayscale200,
-                  shape: BoxShape.circle,
-                ),
-                child: Assets.svg.logoIconTpe.svg(
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          const SizedBox(width: 16), // 圖片與右側文字距離16px
-          // 用戶資訊（垂直置中）
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 名字 16px
-                AppText(
-                  userData.name,
-                  style: AppTextStyles.titleSemiBold.copyWith(fontSize: 16),
-                  color: AppColors.grayscale950,
-                ),
-                const SizedBox(height: 8), // 名字與金幣資訊之間間距8px
-                // 金幣和徽章資訊
-                Row(
-                  children: [
-                    // 金幣：藍點點 icon 20×20
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5AB4C5), // #5AB4C5
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8), // icon與文字之間8px
-                    // 金幣數量數字 14px
-                    AppText(
-                      'x ${userData.totalCoins}',
-                      style: AppTextStyles.body1.copyWith(fontSize: 14),
-                      color: AppColors.grayscale950,
-                    ),
-                    const SizedBox(width: 16), // 金幣與徽章之間間距16px
-                    // 徽章：六角形 icon 20×20
-                    Assets.svg.badgeIcon.svg(
-                      width: 20,
-                      height: 20,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF76A732), // 徽章顏色
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 8), // icon與文字之間8px
-                    // 徽章數量數字 14px
-                    Obx(() => AppText(
-                      'x ${controller.collectedBadgesCount.value}',
-                      style: AppTextStyles.body1.copyWith(fontSize: 14),
-                      color: AppColors.grayscale950,
-                    )),
-                  ],
-                ),
-              ],
+            ],
+          ),
+          child: AppText(
+            'level1', // TODO: 替換成真實玩家等級
+            style: AppTextStyles.caption.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.grayscale800,
             ),
           ),
-          // 右側箭頭指示可點擊，與白框右側間距24px（使用padding）
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: AppColors.grayscale400,
-            ),
-          ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -386,7 +345,39 @@ class HomeView extends GetView<HomeController> {
       final selected = controller.selectedBadge.value;
 
       if (badges.isEmpty) {
-        return const SizedBox.shrink();
+        // 無徽章時顯示假資料圖片（TestCute1、TestCute2），如徽章方式排列
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.white.withOpacity(0.92),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.grayscale300.withOpacity(0.35),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(width: 8),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _CuteImageSlot(assetPath: 'assets/svg/TestCute1.png'),
+                    _CuteImageSlot(assetPath: 'assets/svg/TestCute2.png'),
+                    _CuteImageSlot(assetPath: 'assets/svg/CuteButton.png'),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        );
       }
 
       return Container(
@@ -426,7 +417,8 @@ class HomeView extends GetView<HomeController> {
                       : null;
                   final isSelected = badge != null && selected?.id == badge.id;
                   final badgeIndex = badge != null
-                      ? controller.badges.indexWhere((b) => b.badgeId == badge.badgeId)
+                      ? controller.badges
+                          .indexWhere((b) => b.badgeId == badge.badgeId)
                       : -1;
                   return Expanded(
                     child: Padding(
@@ -466,7 +458,6 @@ class HomeView extends GetView<HomeController> {
 
   Widget _buildTrackingControls() {
     return Obx(() {
-      final isTracking = controller.isTracking.value;
       final goButtonWidth = 100.0; // 固定為 100x100
       final positionButtonWidth = 54.0;
       final spacing = 50.0;
@@ -482,7 +473,7 @@ class HomeView extends GetView<HomeController> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
               children: [
-                // 位置按鈕（位於 GO 按鈕左側 50px 處）
+                // 位置按鈕（位於中央大按鈕左側 50px 處）
                 Obx(() => GestureDetector(
                       onTap: () {
                         controller.centerToUserLocation();
@@ -516,68 +507,35 @@ class HomeView extends GetView<HomeController> {
                         ),
                       ),
                     )),
-                SizedBox(width: spacing), // GO 按鈕左邊距離 50px
+                SizedBox(width: spacing),
               ],
             ),
           ),
-          // GO/END 按鈕（位於螢幕水平正中）
+          // 中央大按鈕：白底 + CuteButton 圖片，點擊展開徽章選單（與右側徽章按鈕相同功能）
           GestureDetector(
-            onTap: () {
-              if (isTracking) {
-                controller.stopTracking();
-              } else {
-                controller.startTracking();
-              }
-            },
-            child: isTracking
-                ? // END 按鈕：100×100（含8px外框）的圓形，外框#5AB4C5，內裡#FFFFFF
-                  Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white, // 內裡 #FFFFFF
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF5AB4C5), // 外框 #5AB4C5
-                          width: 8, // 8px外框
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x33000000),
-                            blurRadius: 16,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: AppText(
-                        'END',
-                        style: AppTextStyles.h1SemiBold.copyWith(fontSize: 36), // 36px
-                        color: const Color(0xFF5AB4C5), // #5AB4C5
-                      ),
-                    )
-                : // GO 按鈕：保持原有樣式
-                  Container(
-                      width: goButtonWidth,
-                      height: goButtonWidth,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary500,
-                        shape: BoxShape.circle,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x33000000),
-                            blurRadius: 16,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: AppText(
-                        'GO',
-                        style: AppTextStyles.h1SemiBold, // H1-semibold，36pt
-                        color: AppColors.white,
-                      ),
-                    ),
+            onTap: controller.toggleBadgePanel,
+            child: Container(
+              width: goButtonWidth,
+              height: goButtonWidth,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 16,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/svg/CuteButton.png',
+                width: goButtonWidth * 0.6,
+                height: goButtonWidth * 0.6,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
           Expanded(
             child: Row(
@@ -602,9 +560,9 @@ class HomeView extends GetView<HomeController> {
       final iconSize = size * 0.6;
 
       return Opacity(
-        opacity: hasBadges ? 1 : 0.4,
+        opacity: hasBadges ? 1 : 0.7,
         child: GestureDetector(
-          onTap: hasBadges ? controller.toggleBadgePanel : null,
+          onTap: controller.toggleBadgePanel,
           child: Container(
             width: size,
             height: size,
@@ -635,7 +593,44 @@ class HomeView extends GetView<HomeController> {
       );
     });
   }
+}
 
+/// 假資料圖片一格（如徽章般圓形顯示）
+class _CuteImageSlot extends StatelessWidget {
+  const _CuteImageSlot({required this.assetPath});
+
+  final String assetPath;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              assetPath,
+              width: 56,
+              height: 56,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _BadgePreview extends StatelessWidget {

@@ -545,10 +545,7 @@ class HomeController extends GetxController {
   }
 
   void toggleBadgePanel() {
-    if (badges.isEmpty) {
-      isBadgePanelVisible.value = false;
-      return;
-    }
+    // 無論有無徽章都可開關選單（無徽章時顯示空狀態）
     isBadgePanelVisible.toggle();
   }
 
