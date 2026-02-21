@@ -58,6 +58,8 @@ flutter:
   assets:
     - assets/mock_data/
     - assets/svg/
+    - assets/svg/icon_arrow_left.svg
+    - assets/svg/icon_tabbar_home_default.svg
     - .env
   
   # 如果需要使用字體

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,7 +14,6 @@ import 'package:dinosaur/util/app_route.dart';
 import 'package:dinosaur/util/app_text.dart';
 
 const _badgeCompletedColor = Color(0xFF76A732);
-const _badgeBaseColor = Color(0xFF76A732);
 const double _badgeCloseButtonSize = 26;
 
 class HomeView extends GetView<HomeController> {
@@ -457,13 +457,12 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildTrackingControls() {
-    return Obx(() {
-      final goButtonWidth = 100.0; // 固定為 100x100
-      final positionButtonWidth = 54.0;
-      final spacing = 50.0;
-      const badgeButtonSize = 54.0;
+    final goButtonWidth = 100.0; // 固定為 100x100
+    final positionButtonWidth = 54.0;
+    final spacing = 50.0;
+    const badgeButtonSize = 54.0;
 
-      return Row(
+    return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
         children: [
@@ -542,7 +541,7 @@ class HomeView extends GetView<HomeController> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(width: spacing), // GO 按鈕右側距離 50px
-                _buildBadgeToggleButton(size: badgeButtonSize),
+                _buildPetBackpackButton(size: badgeButtonSize),
                 if (positionButtonWidth > badgeButtonSize)
                   SizedBox(width: positionButtonWidth - badgeButtonSize),
               ],
@@ -550,48 +549,47 @@ class HomeView extends GetView<HomeController> {
           ),
         ],
       );
-    });
   }
 
-  Widget _buildBadgeToggleButton({double size = 54}) {
-    return Obx(() {
-      final hasBadges = controller.badges.isNotEmpty;
-      final backgroundColor = AppColors.white;
-      final iconSize = size * 0.6;
+  Widget _buildPetBackpackButton({double size = 54}) {
+    final backgroundColor = AppColors.white;
+    final iconSize = size * 0.6;
 
-      return Opacity(
-        opacity: hasBadges ? 1 : 0.7,
-        child: GestureDetector(
-          onTap: controller.toggleBadgePanel,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              shape: BoxShape.circle,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 12,
-                  offset: Offset(0, 6),
-                ),
-              ],
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoute.petBackpack),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 12,
+              offset: Offset(0, 6),
             ),
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/svg/badge_icon.svg',
-                width: iconSize,
-                height: iconSize,
-                colorFilter: const ColorFilter.mode(
-                  _badgeBaseColor,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
+          ],
+        ),
+        child: Center(
+          child: FutureBuilder<ByteData>(
+            future: rootBundle.load('assets/svg/icon_tabbar_home_default.svg')
+                .then((d) => d)
+                .catchError((_) => throw Exception('missing')),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                return SvgPicture.asset(
+                  'assets/svg/icon_tabbar_home_default.svg',
+                  width: iconSize,
+                  height: iconSize,
+                );
+              }
+              return Icon(Icons.home, size: iconSize, color: AppColors.grayscale700);
+            },
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 

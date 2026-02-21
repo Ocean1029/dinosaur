@@ -7,6 +7,8 @@ import 'package:dinosaur/page/activity_detail/activity_detail_view.dart';
 import 'package:dinosaur/page/activity_detail/activity_detail_controller.dart';
 import 'package:dinosaur/page/badge_detail/badge_detail_view.dart';
 import 'package:dinosaur/page/badge_detail/badge_detail_controller.dart';
+import 'package:dinosaur/page/pet_backpack/pet_backpack_view.dart';
+import 'package:dinosaur/page/pet_backpack/pet_backpack_controller.dart';
 
 /// 應用程式路由管理
 abstract final class AppRoute {
@@ -17,6 +19,7 @@ abstract final class AppRoute {
   static const String homeActivityDetail = '/home-activity-detail'; // 向後兼容
   static const String homeBadgeDetail = '/home-badge-detail'; // 向後兼容
   static const String badgeDetail = '/badge-detail';
+  static const String petBackpack = '/pet-backpack';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -45,6 +48,13 @@ abstract final class AppRoute {
       page: () => const BadgeDetailView(),
       binding: BindingsBuilder(() {
         Get.lazyPut<BadgeDetailController>(() => BadgeDetailController());
+      }),
+    ),
+    GetPage(
+      name: petBackpack,
+      page: () => const PetBackpackView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<PetBackpackController>(() => PetBackpackController());
       }),
     ),
   ];
