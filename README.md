@@ -7,7 +7,8 @@
 - **前端（Flutter）**
   - 基本專案結構與資源管理（`assets/`、`lib/gen/` 等）
   - 首頁 / 活動細節 / 徽章細節 / 統計頁面等畫面結構（`lib/page/home`、`activity_detail`、`badge_detail`、`stats`）
-  - 初步的資料模型與假資料（`lib/model/`、`lib/page/home/mock_data.dart`）
+  - **寵物／背包頁**（`lib/page/pet_backpack/`）：從首頁右下角按鈕（圖示 `icon_tabbar_home_default`）進入；可切換寵物、顯示等級／出生地／種類／飢餓值，以及「食物」標籤下的背包網格，點擊道具可餵食當前寵物（目前使用 mock 資料）
+  - 初步的資料模型與假資料（`lib/model/`、`lib/page/home/mock_data.dart`、`lib/page/pet_backpack/mock_data.dart`）
 - **後端（Node.js + Express + Prisma）**
   - 基本 API 伺服器骨架（`backend/src`）
   - NFC 閱讀相關 API 端點，例如：
@@ -27,7 +28,8 @@
 - **Flutter App**
   - `lib/main.dart`：應用程式進入點
   - `lib/page/`：主要頁面與對應的 controller / view
-    - `home/`：首頁、活動列表 / 點位顯示等
+    - `home/`：首頁、活動列表 / 點位顯示、中央 GO 按鈕（開啟徽章選單）、右下角寵物／背包按鈕（進入寵物背包頁）
+    - `pet_backpack/`：寵物展示（可左右切換）、等級與飢餓值、背包食物網格與餵食
     - `activity_detail/`：單一活動詳情
     - `badge_detail/`：徽章詳情與分享畫面
     - `stats/`：統計資訊相關畫面
@@ -89,12 +91,20 @@ npm run dev
 - 建立前端頁面骨架與基本 UI 結構
 - 整理主要資料模型與假資料
 - 建立後端 API 伺服器與主要 NFC 相關端點
+- 完成寵物／背包頁：寵物切換、等級／出生地／種類／飢餓值、食物背包與餵食（mock）；主頁右下角按鈕改為進入此頁
+
+**寵物／背包相關 API 規劃（後端尚未實作，目前前端以 mock 取代）**
+
+- `GET /user/pets`：取得使用者寵物列表
+- `GET /backpack?tag=food`：取得背包內容（依標籤，如食物）
+- `POST /pets/{petId}/feed`：餵食寵物（body: `{ "itemId": "xxx", "amount": 1 }`）
 
 **下一步規劃（建議）**
 
 - 串接實際資料庫（Prisma + 真實資料表結構）
 - 串接真實 NFC 裝置與實機測試流程
 - 完成前端與後端的實際 API 串接（取代 mock data）
+- 實作寵物／背包相關後端 API 並與前端串接
 - 加入錯誤處理、狀態顯示與基本追蹤/記錄
 
 ---
