@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:dinosaur/service/account_service.dart';
 import 'package:dinosaur/service/service.dart';
 import 'package:dinosaur/page/home/api_service.dart';
@@ -10,13 +13,43 @@ import 'package:dinosaur/util/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 載入 .env 文件
-  await dotenv.load(fileName: ".env");
-  
+
+  // 捕獲未處理的 Dart 錯誤與 Flutter 框架錯誤，方便排查閃退（「Lost connection to device」多為原生崩潰）
+  runZonedGuarded(() async {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('FlutterError: ${details.exception}\n${details.stack}');
+    };
+    await _runApp();
+  }, (error, stack) {
+    debugPrint('Uncaught error: $error\n$stack');
+  });
+}
+
+Future<void> _runApp() async {
+
+  // 載入 .env 文件（若檔案不存在則略過，避免閃退）
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('dotenv: .env 未找到或載入失敗，使用預設值: $e');
+  }
+
+  // 初始化 Mapbox Access Token（建議用 public token: pk. 開頭）
+  try {
+    final mapboxToken = dotenv.env['MAPBOX_ACCESS_TOKEN'] ?? '';
+    if (mapboxToken.isNotEmpty) {
+      MapboxOptions.setAccessToken(mapboxToken);
+    } else {
+      debugPrint('Mapbox token is empty. Please set MAPBOX_ACCESS_TOKEN in .env');
+    }
+  } catch (e) {
+    debugPrint('Failed to set Mapbox access token: $e');
+  }
+
   // 初始化 iOS Google Maps API Key
   await initGoogleMapsApiKey();
-  
+
   await initServices();
   runApp(const MyApp());
 }

@@ -49,7 +49,8 @@
 	<string>此應用需要您的位置信息以記錄運動路線和尋找附近的地點</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>此應用需要您的位置信息以記錄運動路線和尋找附近的地點</string>
-	<!-- Google Maps API Key is now loaded from .env file via Flutter MethodChannel -->
-	<!-- If you need a fallback, you can add GMS_API_KEY here, but it's not recommended -->
+	<!-- 後備用：當 Flutter 尚未注入 key 時先初始化 Google Maps SDK，避免地圖載入閃退。正式上線請改為真實 key -->
+	<key>GMS_API_KEY</key>
+	<string>your_google_maps_api_key_here</string>
 </dict>
 </plist>

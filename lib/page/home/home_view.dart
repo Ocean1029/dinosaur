@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mb;
 import 'package:dinosaur/gen/assets.gen.dart';
 import 'package:dinosaur/page/home/home_controller.dart';
 import 'package:dinosaur/page/home/point.dart';
@@ -79,17 +79,20 @@ class HomeView extends GetView<HomeController> {
 
         return Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: HomeController.initialCameraPosition,
-              markers: controller.markers.toSet(),
-              polylines: controller.polylines.toSet(),
-              onMapCreated: controller.onMapCreated,
-              onCameraMove: controller.onCameraMove,
-              onCameraIdle: controller.onCameraIdle,
-              myLocationButtonEnabled: false,
-              myLocationEnabled: true,
-              zoomGesturesEnabled: true,
-              zoomControlsEnabled: false,
+            mb.MapWidget(
+              key: const ValueKey('mapbox-map'),
+              // Standard 樣式較容易呈現 3D（傾斜/建物）視覺效果
+              styleUri:
+                  'mapbox://styles/angelicazywang/cmm1idkcb003e01r68x8mgqdq',
+              cameraOptions: mb.CameraOptions(
+                // 注意：Position 順序是 (lng, lat)
+                center: mb.Point(
+                  coordinates: mb.Position(121.564468, 25.033968),
+                ),
+                zoom: 15,
+                // 0-60 常見；數值越大越「斜」越有 3D 感
+                pitch: 35.0,
+              ),
             ),
             // 動態計算欄（追蹤時顯示）
             Obx(() {
@@ -101,11 +104,11 @@ class HomeView extends GetView<HomeController> {
                   child: _buildTrackingStatsCard(),
                 );
               }
-              // 右上角頭貼 + 等級（非追蹤時顯示，可點擊進入個人資訊）
+              // 左上角頭貼 + 等級（非追蹤時顯示，可點擊進入個人資訊）
               if (controller.userProfile.value != null) {
                 return Positioned(
                   top: 16,
-                  right: 16,
+                  left: 16,
                   child: GestureDetector(
                     onTap: () => Get.toNamed(AppRoute.stats),
                     child: _buildAvatarWithLevel(controller.userProfile.value!),
@@ -271,7 +274,7 @@ class HomeView extends GetView<HomeController> {
 
   /// 右上角頭貼 + 等級（之後等級可替換成真實玩家等級）
   Widget _buildAvatarWithLevel(userData) {
-    const avatarSize = 64.0;
+    const avatarSize = 44.0;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -313,9 +316,9 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             color: AppColors.white.withOpacity(0.9),
             borderRadius: BorderRadius.circular(999),
@@ -332,6 +335,7 @@ class HomeView extends GetView<HomeController> {
             style: AppTextStyles.caption.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.grayscale800,
+              fontSize: 11,
             ),
           ),
         ),
@@ -457,100 +461,98 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildTrackingControls() {
-    return Obx(() {
-      final goButtonWidth = 100.0; // 固定為 100x100
-      final positionButtonWidth = 54.0;
-      final spacing = 50.0;
-      const badgeButtonSize = 54.0;
+    const goButtonWidth = 100.0; // 固定為 100x100
+    const positionButtonWidth = 54.0;
+    const spacing = 50.0;
+    const badgeButtonSize = 54.0;
 
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
-        children: [
-          // 左側空白，用於平衡布局
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
-              children: [
-                // 位置按鈕（位於中央大按鈕左側 50px 處）
-                Obx(() => GestureDetector(
-                      onTap: () {
-                        controller.centerToUserLocation();
-                      },
-                      child: Container(
-                        width: positionButtonWidth,
-                        height: positionButtonWidth,
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x33000000),
-                              blurRadius: 16,
-                              offset: Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: SvgPicture.asset(
-                          'assets/svg/position.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            controller.isUserLocationCentered.value
-                                ? const Color(0xFF5AB4C5) // 居中時為藍色
-                                : const Color(0xFF475259), // 未居中時為灰色
-                            BlendMode.srcIn,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
+      children: [
+        // 左側空白，用於平衡布局
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center, // 垂直置中
+            children: [
+              // 位置按鈕（位於中央大按鈕左側 50px 處）
+              Obx(() => GestureDetector(
+                    onTap: () {
+                      controller.centerToUserLocation();
+                    },
+                    child: Container(
+                      width: positionButtonWidth,
+                      height: positionButtonWidth,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33000000),
+                            blurRadius: 16,
+                            offset: Offset(0, 8),
                           ),
-                          fit: BoxFit.contain,
-                        ),
+                        ],
                       ),
-                    )),
-                SizedBox(width: spacing),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/svg/position.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          controller.isUserLocationCentered.value
+                              ? const Color(0xFF5AB4C5) // 居中時為藍色
+                              : const Color(0xFF475259), // 未居中時為灰色
+                          BlendMode.srcIn,
+                        ),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  )),
+              SizedBox(width: spacing),
+            ],
+          ),
+        ),
+        // 中央大按鈕：白底 + CuteButton 圖片，點擊展開徽章選單（與右側徽章按鈕相同功能）
+        GestureDetector(
+          onTap: controller.toggleBadgePanel,
+          child: Container(
+            width: goButtonWidth,
+            height: goButtonWidth,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 8),
+                ),
               ],
             ),
-          ),
-          // 中央大按鈕：白底 + CuteButton 圖片，點擊展開徽章選單（與右側徽章按鈕相同功能）
-          GestureDetector(
-            onTap: controller.toggleBadgePanel,
-            child: Container(
-              width: goButtonWidth,
-              height: goButtonWidth,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                shape: BoxShape.circle,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x33000000),
-                    blurRadius: 16,
-                    offset: Offset(0, 8),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: Image.asset(
-                'assets/svg/CuteButton.png',
-                width: goButtonWidth * 0.6,
-                height: goButtonWidth * 0.6,
-                fit: BoxFit.contain,
-              ),
+            alignment: Alignment.center,
+            child: Image.asset(
+              'assets/svg/CuteButton.png',
+              width: goButtonWidth * 0.6,
+              height: goButtonWidth * 0.6,
+              fit: BoxFit.contain,
             ),
           ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(width: spacing), // GO 按鈕右側距離 50px
-                _buildBadgeToggleButton(size: badgeButtonSize),
-                if (positionButtonWidth > badgeButtonSize)
-                  SizedBox(width: positionButtonWidth - badgeButtonSize),
-              ],
-            ),
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(width: spacing), // GO 按鈕右側距離 50px
+              _buildBadgeToggleButton(size: badgeButtonSize),
+              if (positionButtonWidth > badgeButtonSize)
+                SizedBox(width: positionButtonWidth - badgeButtonSize),
+            ],
           ),
-        ],
-      );
-    });
+        ),
+      ],
+    );
   }
 
   Widget _buildBadgeToggleButton({double size = 54}) {

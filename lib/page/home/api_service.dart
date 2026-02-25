@@ -390,20 +390,8 @@ class ApiService extends GetxService {
     required String userId,
   }) async {
     if (useMockData) {
-      // Mock模式下也從真實API獲取數據，確保數據從數據庫讀取
-      try {
-        final response = await _get('/api/users/$userId/badges');
-        final data = response['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
-        final collectedCount = data['collectedCount'] as int? ?? 0;
-        final totalCount = data['totalBadges'] as int? ?? 0;
-        return UserBadgeStats(
-          collectedCount: collectedCount,
-          totalCount: totalCount,
-        );
-      } catch (e) {
-        debugPrint('Mock模式：無法連接到後端，返回空統計');
-        return const UserBadgeStats(collectedCount: 0, totalCount: 0);
-      }
+      // Mock 模式：不連後端，直接回傳本地假資料
+      return const UserBadgeStats(collectedCount: 0, totalCount: 0);
     }
 
     final response = await _get('/api/users/$userId/badges');
@@ -570,67 +558,25 @@ class ApiService extends GetxService {
     );
   }
 
-  /// Mock 用戶徽章列表
-  /// 注意：即使使用Mock模式，也嘗試從真實API獲取數據，確保顏色從數據庫讀取
+  /// Mock 用戶徽章列表（Mock 模式不連後端，直接回傳空列表）
   Future<List<BadgeModel>> _getMockUserBadges({required String userId}) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    // Mock模式下，嘗試從真實API獲取數據（如果後端可用）
-    // 這樣可以確保即使使用Mock模式，顏色也從數據庫獲取
-    try {
-      final response = await _get('/api/users/$userId/badges');
-      final data = response['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
-      final badges = data['badges'] as List<dynamic>? ?? <dynamic>[];
-      
-      return badges
-          .map((json) {
-            return BadgeModel.fromJson(json as Map<String, dynamic>);
-          })
-          .toList(growable: false);
-    } catch (e) {
-      // 如果後端不可用，返回空列表
-      debugPrint('Mock模式：無法連接到後端，返回空徽章列表');
-      return <BadgeModel>[];
-    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    return <BadgeModel>[];
   }
 
-  /// Mock 徽章詳情
-  /// 注意：即使使用Mock模式，也嘗試從真實API獲取數據，確保顏色從數據庫讀取
+  /// Mock 徽章詳情（Mock 模式不連後端，拋出例外由呼叫端處理）
   Future<BadgeDetailModel> _getMockBadgeDetail({
     required String userId,
     required String badgeId,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    // Mock模式下，嘗試從真實API獲取數據
-    try {
-      final response = await _get('/api/users/$userId/badges/$badgeId');
-      final data = response['data'] as Map<String, dynamic>;
-      return BadgeDetailModel.fromJson(data);
-    } catch (e) {
-      debugPrint('Mock模式：無法連接到後端獲取徽章詳情');
-      rethrow;
-    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    throw Exception('Mock 模式無徽章詳情資料');
   }
 
-  /// Mock 所有徽章列表
+  /// Mock 所有徽章列表（Mock 模式不連後端，直接回傳空列表）
   Future<List<BadgeModel>> _getMockAllBadges() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    // Mock模式下，嘗試從真實API獲取數據（如果後端可用）
-    // 這樣可以確保即使使用Mock模式，顏色也從數據庫獲取
-    try {
-      final response = await _get('/api/badges');
-      final data = response['data'] as List<dynamic>? ?? <dynamic>[];
-      
-      return data
-          .map((dynamic json) => BadgeModel.fromJson(json as Map<String, dynamic>))
-          .toList(growable: false);
-    } catch (e) {
-      // 如果後端不可用，返回空列表
-      debugPrint('Mock模式：無法連接到後端，返回空徽章列表');
-      return <BadgeModel>[];
-    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    return <BadgeModel>[];
   }
 
   /// Mock 活動列表資料
